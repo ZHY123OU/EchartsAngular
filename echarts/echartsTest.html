@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="./libs/echarts.min.js"></script>
+    <script src="./libs/jquery.min.js"></script>
+    <style>
+        .main {
+            width: 500px;
+            height: 500px;
+        }
+        
+    </style>
+
+</head>
+<body>
+    <button class='addData'>可点我</button>
+    <div class='main'></div>
+
+    <button class='addData1'>可点我</button>
+    <div class='main'></div>
+</body>
+</html>
+<script>
+    var main = echarts.init($('.main')[0])
+
+    var option = {
+            title: {
+                text: 'ECharts 入门示例'
+            },
+            tooltip: {},
+            legend: {
+                data:['销量']
+            },
+            xAxis: {
+                data: ["衬衫","羊毛衫","雪纺衫","裤子","高跟鞋","袜子"]
+            },
+            yAxis: {},
+            series: [{
+                name: '销量',
+                type: 'bar',
+                data: [5, 20, 36, 10, 10, 20]
+            }]
+    };
+
+    var option1 = {
+            title: {
+                text: 'ECharts 入门示例'
+            },
+            tooltip: {},
+            legend: {
+                data:['销量']
+            },
+            xAxis: {
+                data: ["衬衫","羊毛衫","雪纺衫","裤子","高跟鞋","袜子"]
+            },
+            yAxis: {},
+            series: [{
+                name: '销量',
+                type: 'bar',
+                data: [5, 20, 36, 10, 10, 20]
+            }]
+    };
+
+    main.setOption(option);
+
+    $('.addData').click(function() {
+        option.series.push({
+            name: '销量',
+            type: 'bar',
+            data: [5, 20, 36, 10, 10, 20]
+        })
+
+        main.setOption(option);
+    })
+
+
+    var main1 = echarts.init($('.main')[1])
+
+    main1.setOption(option1);
+
+    $('.addData1').click(function() {
+        option1.series.push({
+            name: '销量',
+            type: 'bar',
+            data: [5, 20, 36, 10, 10, 20]
+        })
+
+        main1.setOption(option1);
+
+    })
+		
+		var obj = {
+			a: 1,
+			b: 2
+		}
+
+		function dataFun(obj) {
+			for (let k in obj.data) {
+				this[k] = obj[k]
+			}
+		}
+
+		
+		var newData = new dataFun(obj);
+		
+		console.log(newData, 'newData')
+</script>
