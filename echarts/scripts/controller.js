@@ -612,8 +612,6 @@ var app = angular.module('myApp', ['ngDraggable', 'ngEcharts'])
         ]
     };
     
-
-    
     //递归循环出左侧列表
 	$scope.List = [
 		{
@@ -622,7 +620,12 @@ var app = angular.module('myApp', ['ngDraggable', 'ngEcharts'])
 				{
 					dataType: 'x',
 					dataName: 'years',
-					data: xData1
+					data: xData1,
+					dataList: [
+//						{
+//							dataName: '2080'
+//						}
+					]
 				},
 				{
 					dataType: 'x',
@@ -700,14 +703,12 @@ var app = angular.module('myApp', ['ngDraggable', 'ngEcharts'])
 	$scope.itemClick = function(item) {
 		item.isShow = !item.isShow
 	}
-	
-	
+		
 	//点击显示隐藏子数据
 	$scope.isShowEchItem = function() {
 		$scope.isShowItem = !$scope.isShowItem
 	}
-	
-	
+		
 	//x轴成功引入数据的方法
 	$scope.hasDropX = function(data) {
 		if (data.dataType != 'x'){
@@ -756,7 +757,9 @@ var app = angular.module('myApp', ['ngDraggable', 'ngEcharts'])
 
 		var dataIndex = $scope.echItemes[$scope.showEchartsId].dataY.indexOf(data)
 
+			console.log('hasDEl')
 		if (dataIndex != -1) {
+
 			echArr[$scope.showEchartsId].series.splice(dataIndex, 1);
 			$scope.echItemes[$scope.showEchartsId].dataY.splice(dataIndex, 1);
 			$scope['option' + $scope.showEchartsId] = data.dataName + '-';
@@ -765,6 +768,7 @@ var app = angular.module('myApp', ['ngDraggable', 'ngEcharts'])
 
 	//添加echarts图表的方法
 	$scope.addEcharts = function(oldData) {
+		if (oldData.dataType) return;
 		
 		if (oldData.data === 'line1') {
 			var newData = new linE1();		
@@ -777,7 +781,7 @@ var app = angular.module('myApp', ['ngDraggable', 'ngEcharts'])
 		}else {
 			return;
 		}
-
+		console.log(newData, 'newData')
 				
 		$scope.echItemes.push({
 			dataX: '',
@@ -853,7 +857,10 @@ var app = angular.module('myApp', ['ngDraggable', 'ngEcharts'])
 	}
 	
 	//选定想要改变数据的echarts
-	$scope.echartsClick = function(i, item) {		
+	$scope.echartsClick = function(i, item) {
+		if (i == $scope.showEchartsId) {
+			return;
+		}
 		showMesItem(i);
 	}
 	
