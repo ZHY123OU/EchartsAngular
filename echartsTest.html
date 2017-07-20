@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="./libs/angular.min.js"></script>
+    <script src="./libs/echarts.min.js"></script>
+    <script src="./libs/jquery.min.js"></script>
+    
+    <script src="./libs/ng-echarts.js"></script>
+    <script src="./libs/angular-route.min.js"></script>
+    
+    <script src="./libs/bootstrap.min.js"></script>
+    <link src="./libs/bootstrap.min.css"></link>
+    
+    <script src="./scripts/controller.js"></script>
+    <script src='./scripts/directive.js'></script>
+    <script src='./libs/ngDraggable.js'></script>
+    <style>
+    	* {
+    		margin: 0;
+    		padding: 0;
+    		
+    	}
+    	html, body {
+    		width: 100%;
+    		height: 100%;
+    	}
+       .wrapper {
+       	display: flex;
+       	width: 100%;
+       	height: 100%;
+       	
+       }
+       
+       .aside {
+       	flex:2;
+       	background-color: orange;
+       }
+        .main {
+        	flex: 11;
+        	background-color: skyblue;
+        }
+        tree-view div {
+        	display: flex;
+        	height: 50px;
+        	border: 1px solid #000;
+        }
+        
+        .testParent {
+        	display: inline-flex;
+        	width: 500px;
+        	height: 500px;
+        	justify-content: center;
+        	align-items: center;
+        	border: 1px solid #000;
+        }
+        
+        .testChild {
+        	width: 200px;
+        	height: 200px;
+        	border: 1px solid #000;
+        }
+        
+        .echarts {
+        	width: 100%;
+        	height: 100%;
+        	border: 1px solid red
+        }
+        .echarts ng-echarts {
+        	width: 100%;
+        	height: 100%;
+        	display: block;
+        	border-bottom: 1px dashed blue;
+        }
+    </style>
+
+</head>
+<body ng-app='myApp' ng-controller='myApp.ctrl'>
+	<div class='wrapper'>
+		<!--<div ng-drag='{{isDrag}}' draggable class='testParent'>
+			<div ng-click='dragFun()' ng-drag='true' class='testChild'></div>
+		</div>-->
+		<div class='echarts'>
+			<ng-echarts ec-config='lineConfig' ec-option='option'></ng-echarts>
+		</div>
+		<!--<div class="aside">
+	    	<div ng-drag='true' ng-drag-data='item.dataList' ng-repeat='(index, item) in items'>{{item.dataName}}</div>	
+	    </div>
+	    <div class='main'>
+	    	<tree-view tree-data='treeData'></tree-view>
+	    </div>-->
+	</div>
+	
+	
+    
+</body>
+</html>
+<script>
+	angular.module('myApp', ['ngDraggable', 'ngEcharts'])
+	.controller('myApp.ctrl', ['$scope', function($scope) {
+		$scope.option = {
+			tooltip : {
+	            trigger: 'axis',
+	            axisPointer: {
+	                type: 'cross',
+	                label: {
+	                    //backgroundColor: '#6a7985'
+	                }
+	            }
+	      },
+	        legend: {
+	        //data:['邮件营销','联盟广告','视频广告','直接访问','搜索引擎']
+				data:[],
+//				textStyle: {
+//					color: '#fff'
+//				}
+	       },
+	        toolbox: {
+	            feature: {
+	                saveAsImage: {}
+	            }
+	        },
+	        grid: {
+	            height: '62%',
+	        },
+	        xAxis : [
+	            {
+	                type : 'category',
+	                boundaryGap : false,
+	                data : [],
+//	                axisLine : {
+//	                	lineStyle: {
+//	                		color: '#fff'
+//	                	}
+//	                }
+	            }
+	        ],
+	        yAxis : [
+	            {
+	                type : 'value',
+//	                 axisLine : {
+//	                	lineStyle: {
+//	                		color: '#fff'
+//	                	}
+//	                },
+	                nameTextStyle: {
+	                	color: '#fff'
+	                }
+	            }
+	        ],
+	        dataZoom: [
+		        {
+		            type: 'inside',
+		            xAxisIndex: 0,
+		            filterMode: 'empty'
+		        },
+		        {
+		            type: 'slider',
+		            xAxisIndex: 0,
+		            filterMode: 'empty'
+		        },
+	
+		    ],
+	        series : [
+	           
+	        ],
+	        color : ['orange', 'red', 'yellow', 'green', 'skyblue']
+		};
+
+		function onClick(params) {
+			console.log(params)
+		}
+		$scope.lineConfig = {
+            theme:'3321',
+            event: [{click:onClick}],
+            dataLoaded:true
+        };
+		$scope.isDrag = false
+		$scope.dragFun = function() {
+			
+			$scope.isDrag = true
+		}
+		
+		$scope.items = [
+			{
+				dataName: '1-2-1组合',
+				dataList: [{flex: 1},{flex: 2},{flex: 1}]
+			}, 
+			{
+				dataName: '1-2-3组合',
+				dataList: [{flex: 1}, {flex: 2}, {flex: 3}]
+			}, 
+			{
+				dataName: '3-2-1组合',
+				dataList: [{flex: 3}, {flex: 2}, {flex: 1}]
+			},
+			{
+				dataName: '3-2-1组合',
+				dataList: [{flex: 3}, {flex: 2}, {flex: 3}]
+			}
+			
+		]
+		
+		$scope.treeData = [
+		 	{
+		 		flex: 1,
+		 		list: new Array()
+		 	}
+			
+		]
+	}])
+	
+	.directive('treeView', function() {
+		return {
+			restrict: 'E',
+	        templateUrl: './views/treeView1.html',
+			scope: {
+				treeData: '=',
+				dataName: '@',
+				dropFun: '&'
+	        },
+	        controller: ['$scope', function($scope) {	        	
+	        	$scope.dropFun = function(data, item) {
+	        		item.list = new Array();
+	        		item.list = data;	
+	        	}
+	        }]
+		}
+	})
+</script>
