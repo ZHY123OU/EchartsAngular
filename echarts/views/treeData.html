@@ -1,0 +1,6 @@
+<i ng-class='{"add": !item.isShow, "minus": item.isShow, }' ng-if='!hasChild(item)'></i>
+<input type="checkbox" ng-model='item.isShow' ng-click='itemClick(item)'></i>
+<span>{{item.dataName}}</span>
+<ul ng-if='!hasChild(item)' ng-show='item.isShow' class='tree-view'>
+    <li ng-repeat="item in item.dataList" ng-drag='true' ng-drag-data='item' ng-include="'views/treeData.html'"></li>
+</ul>
