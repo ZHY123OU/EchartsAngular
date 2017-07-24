@@ -142,9 +142,6 @@ var app = angular.module('myApp', ['ngDraggable', 'ngEcharts'])
 		
 		//table 数组
 		$scope.trOne = []
-
-		
-		//var urlName;
 			
 		//y轴的5组模拟数据
 		var data1 = {
@@ -268,10 +265,18 @@ var app = angular.module('myApp', ['ngDraggable', 'ngEcharts'])
 		var xAxisDatas = new Array()
 		
 		//x轴成功引入数据的方法
-		$scope.hasDropX = function(data) {
+		$scope.hasDropX = function(item) {
+			
+			var data = item.item
 			if (data.dataType != 'x'){
 				return 
 			}
+			
+			$scope.List[0].dataList.forEach(function(val) {
+				val.isShow = false;
+			})
+			
+			$scope.List[0].dataList[item.index].isShow = true
 			
 			//单一echarts轴
 			$scope.echItemes[$scope.showEchartsId].dataX = data.dataName;
@@ -288,8 +293,7 @@ var app = angular.module('myApp', ['ngDraggable', 'ngEcharts'])
 			echArr1[$scope.showEchartsId].xAxis.forEach(function(val) {
 				val.data = xAxisDatas;
 			})
-			
-			console.log(echArr1, 'echArr1')
+
 			
 
 			if ($scope.echItemes[$scope.showEchartsId].isOption) {				
@@ -306,11 +310,14 @@ var app = angular.module('myApp', ['ngDraggable', 'ngEcharts'])
 		var minMaxArr = new Array()
 		
 		//y轴成功引入数据的方法
-		$scope.hasDropY = function(data) {	
+		$scope.hasDropY = function(item) {	
+			var data = item.item
 
-			if ($scope.itemYes.indexOf(data) >= 0 || data.dataType != 'y') {
+			if ($scope.echItemes[$scope.showEchartsId].dataY.indexOf(data) >= 0 || data.dataType != 'y') {
 				return
 			}
+			console.log(item, 'item')
+			$scope.List[1].dataList[item.index].isShow = true
 			
 			data.data.data.forEach(function(val, index) {
 				minMaxArr[$scope.showEchartsId].max = minMaxArr[$scope.showEchartsId].max? minMaxArr[$scope.showEchartsId].max : val
@@ -328,6 +335,8 @@ var app = angular.module('myApp', ['ngDraggable', 'ngEcharts'])
 			
 			//单一echarts
 			var tempObj = echArr[$scope.showEchartsId];
+			
+			data.index = item.index
 	
 			$scope.echItemes[$scope.showEchartsId].dataY.push(data);
 			
@@ -421,16 +430,12 @@ var app = angular.module('myApp', ['ngDraggable', 'ngEcharts'])
 			})
 			
 			echArr1[$scope.showEchartsId] = tempObj1;
-			
-			console.log(tempObj1, 'tempObj1')
 
 			if ($scope.echItemes[$scope.showEchartsId].isOption) {				
 				$scope.echItemes[$scope.showEchartsId].option = echArr[$scope.showEchartsId]
 			}else {
 				$scope.echItemes[$scope.showEchartsId].option = echArr1[$scope.showEchartsId]				
 			}	
-			
-			console.log($scope.echItemes[$scope.showEchartsId].option, "$scope.echItemes[$scope.showEchartsId].option")
 			
 
 			$scope.echItemes[$scope.showEchartsId].xyIndex++
@@ -440,8 +445,11 @@ var app = angular.module('myApp', ['ngDraggable', 'ngEcharts'])
 		$scope.delDropY = function(data) {
 	
 			var dataIndex = $scope.echItemes[$scope.showEchartsId].dataY.indexOf(data)
-	
+			console.log(data, 'del')
 			if (dataIndex != -1) {
+				
+				$scope.List[1].dataList[data.index].isShow = false
+				
 				//单组echarts的删除方法
 				echArr[$scope.showEchartsId].series.splice(dataIndex, 1);
 				$scope.echItemes[$scope.showEchartsId].dataY.splice(dataIndex, 1);
@@ -458,8 +466,6 @@ var app = angular.module('myApp', ['ngDraggable', 'ngEcharts'])
 				tempObj1.xAxis.splice(dataIndex, 1);
 				tempObj1.yAxis.splice(dataIndex, 1);
 				tempObj1.series.splice(dataIndex, 1);
-				
-				console.log(tempObj1, 'deltempObj1')
 				
 				tempObj1.xAxis.forEach(function(val, index) {
 					val.gridIndex = index
@@ -499,7 +505,6 @@ var app = angular.module('myApp', ['ngDraggable', 'ngEcharts'])
 					}
 	
 				})
-				console.log(tempObj1, 'del')
 				echArr1[$scope.showEchartsId] = tempObj1;
 				
 				if ($scope.echItemes[$scope.showEchartsId].isOption) {				
@@ -608,13 +613,12 @@ var app = angular.module('myApp', ['ngDraggable', 'ngEcharts'])
 		    		val.startInp = $scope.modelOption.visualMap[index].range[1];
 		    		val.endInp = $scope.modelOption.visualMap[index].range[0];
 		    	})
-		    	
 		    	return
 		    }
 		    
 		    newTempObj.visualMap = new Array();
 		    
-		    for (var j = 0; j < dataLen; j++) {
+		    for (var j = 0; j< dataLen; j++) {
 
 		    	
 		    	newTempObj.series[j].markLine = {
@@ -623,8 +627,6 @@ var app = angular.module('myApp', ['ngDraggable', 'ngEcharts'])
 		    	
 		    	var max = newTempObj.yAxis[j] ? newTempObj.yAxis[j].max : newTempObj.yAxis[0].max
 		    	var min = newTempObj.yAxis[j] ? newTempObj.yAxis[j].min : newTempObj.yAxis[0].min
-		    	
-		    	console.log(max, min, newTempObj, 'newTempObj')
 		    	
 		    	newTempObj.visualMap.push({
 		    		seriesIndex: j,
@@ -658,8 +660,7 @@ var app = angular.module('myApp', ['ngDraggable', 'ngEcharts'])
 				}
 
 				$scope.modelOption.series[i].markLine.data[0] = {yAxis: val};
-				
-				console.log($scope.modelOption, '$scope.modelOption')
+
 			}else if (name == 'end') {				
 //				$scope.modelOption.serise[i].markLine.data[1].yAxis = val;
 				$scope.modelOption.visualMap[i].range[0] = val;
@@ -674,8 +675,6 @@ var app = angular.module('myApp', ['ngDraggable', 'ngEcharts'])
 		
 		$scope.hideBox = function(boxName) {
 			$scope[boxName] = false;
-			
-			console.log($scope.modelOption, 'hide')
 			
 		}
 		

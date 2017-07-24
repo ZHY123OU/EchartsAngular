@@ -6,7 +6,6 @@ angular.module('ngEcharts',[])
         return {
             link: function(scope,element,attrs,ctrl){
                 function refreshChart(){
-                	console.log('im ngEcharts!!')
                     var theme = (scope.config && scope.config.theme)
                         ? scope.config.theme : 'default';
                     var chart = echarts.init(element[0],theme);
