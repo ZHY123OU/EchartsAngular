@@ -10,13 +10,16 @@ var app = angular.module('myApp', ['ngDraggable', 'ngEcharts'])
 		function linE1() {
 			this.tooltip = {
 	            trigger: 'axis',
+	            triggerOn: 'mousemove',
 	            axisPointer: {
-	                type: 'cross',
-	                label: {
-	                    //backgroundColor: '#6a7985'
-	                }
+	                type: 'line',
+	                snap: false,
+//	                animation: true
 	            }
-	       };
+	      };
+  		    this.axisPointer= {
+		        link: {yAxisIndex: 'all'}
+		    };
 	        this.legend= {
 	        //data:['邮件营销','联盟广告','视频广告','直接访问','搜索引擎']
 				data:[],
@@ -25,10 +28,16 @@ var app = angular.module('myApp', ['ngDraggable', 'ngEcharts'])
 //				}
 	        };
 	        this.toolbox= {
-	            feature: {
-	                saveAsImage: {}
-	            }
-	        };
+		        feature: {
+		            dataZoom: {
+		                yAxisIndex: 'none'
+		            },
+		            dataView: {show: true, readOnly: false},
+		            restore: {show: true},
+		            saveAsImage: {show: true}
+		        }
+		    };
+
 	        this.grid= {
 	            height: '62%',
 	        };
@@ -81,14 +90,11 @@ var app = angular.module('myApp', ['ngDraggable', 'ngEcharts'])
 			this.tooltip = {
 	            trigger: 'axis',
 	            axisPointer: {
-	                type: 'cross',
-	                label: {
-	                    //backgroundColor: '#6a7985'
-	                }
+	                animation: true
 	            }
 	       };
 	        this.legend= {
-	        //data:['邮件营销','联盟广告','视频广告','直接访问','搜索引擎']
+//	        data:['邮件营销','联盟广告','视频广告','直接访问','搜索引擎']
 				data:[],
 //				textStyle: {
 //					color: '#fff'
@@ -96,9 +102,17 @@ var app = angular.module('myApp', ['ngDraggable', 'ngEcharts'])
 	        };
 	        this.toolbox= {
 	            feature: {
-	                saveAsImage: {}
-	            }
+		            dataZoom: {
+		                yAxisIndex: 'none'
+		            },
+		            restore: {},
+		            saveAsImage: {}
+		        }
 	        };
+	        
+		    this.axisPointer= {
+		        link: {yAxisIndex: 'all'}
+		    };
 	        this.grid= [];
 	        this.xAxis = [
 	            
@@ -270,18 +284,21 @@ var app = angular.module('myApp', ['ngDraggable', 'ngEcharts'])
 			
 			//多组echarts轴
 			xAxisDatas = data.data;
-			$scope.echItemes1[$scope.showEchartsId].dataX = data.dataName;
 	  
 			echArr1[$scope.showEchartsId].xAxis.forEach(function(val) {
 				val.data = xAxisDatas;
 			})
 			
+			console.log(echArr1, 'echArr1')
+			
 
-			if (isOption) {				
+			if ($scope.echItemes[$scope.showEchartsId].isOption) {				
 				$scope.echItemes[$scope.showEchartsId].option = echArr[$scope.showEchartsId]
 			}else {
 				$scope.echItemes[$scope.showEchartsId].option = echArr1[$scope.showEchartsId]				
 			}
+			
+
 		}
 									
 		var isToggle = true;
@@ -296,9 +313,9 @@ var app = angular.module('myApp', ['ngDraggable', 'ngEcharts'])
 			}
 			
 			data.data.data.forEach(function(val, index) {
-				minMaxArr[$scope.showEchartsId].max = minMaxArr[$scope.showEchartsId]? minMaxArr[$scope.showEchartsId].max : val
-				minMaxArr[$scope.showEchartsId].min = minMaxArr[$scope.showEchartsId]? minMaxArr[$scope.showEchartsId].min : val
-			
+				minMaxArr[$scope.showEchartsId].max = minMaxArr[$scope.showEchartsId].max? minMaxArr[$scope.showEchartsId].max : val
+				minMaxArr[$scope.showEchartsId].min = minMaxArr[$scope.showEchartsId].min? minMaxArr[$scope.showEchartsId].min : val
+				
 				if (val > minMaxArr[$scope.showEchartsId].max) {
 					minMaxArr[$scope.showEchartsId].max = val;
 				}
@@ -315,7 +332,8 @@ var app = angular.module('myApp', ['ngDraggable', 'ngEcharts'])
 			$scope.echItemes[$scope.showEchartsId].dataY.push(data);
 			
 			tempObj.yAxis[0].max = minMaxArr[$scope.showEchartsId].max;
-			tempObj.yAxis[0].min = minMaxArr[$scope.showEchartsId].min;
+			tempObj.yAxis[0].min = minMaxArr[$scope.showEchartsId].min;		
+			
 			tempObj.series.push(data.data);
 			tempObj.legend.data.push(data.dataName);
 			
@@ -345,9 +363,26 @@ var app = angular.module('myApp', ['ngDraggable', 'ngEcharts'])
 
 			})
 			
+			var max;
+			var min;
+			
+			data.data.data.forEach(function(dataVal, dataIndex) {
+				if (dataIndex == 0) {
+					max = dataVal;
+					min = dataVal;
+				}
+				if (dataVal > max) {
+					max = dataVal;
+				}
+				
+				if (dataVal < min) {
+					min = dataVal;
+				}
+			})
+			
 			tempObj1.xAxis.push({
                 type : 'category',
-				gridIndex: arrNum - 1,
+				gridIndex: $scope.echItemes[$scope.showEchartsId].xyIndex,
 				data: xAxisDatas,
 //	                axisLine : {
 //	                	lineStyle: {
@@ -357,7 +392,9 @@ var app = angular.module('myApp', ['ngDraggable', 'ngEcharts'])
             })
 			tempObj1.yAxis.push({
 	                type : 'value',
-	                gridIndex: arrNum - 1,
+	                max: max,
+	                min: min,
+	                gridIndex: $scope.echItemes[$scope.showEchartsId].xyIndex,
 //	                 axisLine : {
 //	                	lineStyle: {
 //	                		color: '#fff'
@@ -367,29 +404,36 @@ var app = angular.module('myApp', ['ngDraggable', 'ngEcharts'])
 	                	color: '#fff'
 	                }
 	          })
+			
+
 			var newTempData = new Object();
 			for (var k in data.data) {
 				newTempData[k] = data.data[k]
 			}
-			newTempData.xAxisIndex = arrNum - 1
-			newTempData.yAxisIndex = arrNum - 1
+			newTempData.xAxisIndex = $scope.echItemes[$scope.showEchartsId].xyIndex
+			newTempData.yAxisIndex = $scope.echItemes[$scope.showEchartsId].xyIndex
 			tempObj1.series.push(newTempData);
 
 			echArr1[$scope.showEchartsId].legend.data.push(data.dataName);
 			
 			tempObj1.dataZoom.forEach(function(val) {
-				val.xAxisIndex.push(arrNum - 1)
+				val.xAxisIndex.push($scope.echItemes[$scope.showEchartsId].xyIndex)
 			})
 			
 			echArr1[$scope.showEchartsId] = tempObj1;
+			
+			console.log(tempObj1, 'tempObj1')
 
 			if ($scope.echItemes[$scope.showEchartsId].isOption) {				
 				$scope.echItemes[$scope.showEchartsId].option = echArr[$scope.showEchartsId]
 			}else {
 				$scope.echItemes[$scope.showEchartsId].option = echArr1[$scope.showEchartsId]				
 			}	
-
 			
+			console.log($scope.echItemes[$scope.showEchartsId].option, "$scope.echItemes[$scope.showEchartsId].option")
+			
+
+			$scope.echItemes[$scope.showEchartsId].xyIndex++
 		}
 	
 		//删除y轴数据的方法
@@ -398,9 +442,72 @@ var app = angular.module('myApp', ['ngDraggable', 'ngEcharts'])
 			var dataIndex = $scope.echItemes[$scope.showEchartsId].dataY.indexOf(data)
 	
 			if (dataIndex != -1) {
+				//单组echarts的删除方法
 				echArr[$scope.showEchartsId].series.splice(dataIndex, 1);
 				$scope.echItemes[$scope.showEchartsId].dataY.splice(dataIndex, 1);
-				$scope['option' + $scope.showEchartsId] = data.dataName + '-';
+				
+				//多条echarts的删除方法
+				$scope.echItemes[$scope.showEchartsId].xyIndex--
+				
+				var tempObj1 = new Object()
+				
+				for (var k in echArr1[$scope.showEchartsId]) {
+					tempObj1[k] = echArr1[$scope.showEchartsId][k]
+				}
+				tempObj1.grid.splice(dataIndex, 1);
+				tempObj1.xAxis.splice(dataIndex, 1);
+				tempObj1.yAxis.splice(dataIndex, 1);
+				tempObj1.series.splice(dataIndex, 1);
+				
+				console.log(tempObj1, 'deltempObj1')
+				
+				tempObj1.xAxis.forEach(function(val, index) {
+					val.gridIndex = index
+				})
+				tempObj1.yAxis.forEach(function(val, index) {
+					val.gridIndex = index					
+				})
+				tempObj1.series.forEach(function(val, index) {
+					val.xAxisIndex = index;
+					val.yAxisIndex = index;
+				})
+				tempObj1.dataZoom.forEach(function(val, index) {
+					val.xAxisIndex.splice(dataIndex, 1)
+					
+					for (var i = 0; i < val.xAxisIndex.length; i++) {
+						val.xAxisIndex[i] = i
+					}
+
+				}) 
+				
+//				console.table(echArr1[$scope.showEchartsId],['gridIndex', 'xAxisIndex', 'yAxisIndex'], 'echArr1[$scope.showEchartsId]')
+				
+				var arrNum = tempObj1.grid.length;
+				var echHeight = 100 / (arrNum + 1);
+				
+				if (arrNum == 0) {
+					return
+				}
+				
+				tempObj1.grid.forEach(function(val, index) {
+					val.height = echHeight - parseInt(echHeight / 5 * 2) + '%'
+					val.bottom = parseInt(echHeight / 5 * 3) + '%'
+					if (index == 0) {
+						val.top = '7%'
+					}else {				
+						val.top = echHeight * index + 7 + '%'
+					}
+	
+				})
+				console.log(tempObj1, 'del')
+				echArr1[$scope.showEchartsId] = tempObj1;
+				
+				if ($scope.echItemes[$scope.showEchartsId].isOption) {				
+					$scope.echItemes[$scope.showEchartsId].option = echArr[$scope.showEchartsId]
+				}else {
+					$scope.echItemes[$scope.showEchartsId].option = echArr1[$scope.showEchartsId]				
+				}
+//				
 			}
 		} 
 
@@ -413,9 +520,6 @@ var app = angular.module('myApp', ['ngDraggable', 'ngEcharts'])
 			}else {
 				$scope.echItemes[$scope.showEchartsId].option = echArr1[$scope.showEchartsId]				
 			}
-//			$scope.echItemes[$scope.showEchartsId].echToggle = !$scope.echItemes[$scope.showEchartsId].echToggle
-//			$scope.echItemes1[$scope.showEchartsId].echToggle = !$scope.echItemes1[$scope.showEchartsId].echToggle
-//			$scope.echItemes[$scope.showEchartsId] = echArr1[$scope.showEchartsId]
 		}
 	
 		//添加echarts图表的方法
@@ -434,37 +538,20 @@ var app = angular.module('myApp', ['ngDraggable', 'ngEcharts'])
 				echToggle: false,
 				option: newData1,
 				isOption: true,
+				xyIndex: 0,
 				config: {
 					theme: 'default',
 					event: [],
 					dataLoaded: true
 				}
 			})
-//			
-//			$scope.echItemes1.push({
-//				dataX: '',
-//				dataY: [],
-//				echToggle: true,
-//				option: newData2,
-//				config: {
-//					theme: 'default',
-//					event: [],
-//					dataLoaded: true
-//				}
-//			})
-			
-
-//			$scope.echItemes1[$scope.echItemes1.length - 1].echToggle = false
-//			$scope.echItemes[$scope.echItemes1.length - 1].echToggle = true
-
 			
 			echArr.push(newData1)
 			echArr1.push(newData2)
 			
 			showMesItem($scope.echItemes.length - 1)
-
-//			$scope['option' + $scope.showEchartsId] = newData1
-//			$scope['option1' + $scope.showEchartsId] = newData2
+			
+			minMaxArr.push(new Object())
 
 		}
 		
@@ -486,9 +573,111 @@ var app = angular.module('myApp', ['ngDraggable', 'ngEcharts'])
 			$scope['echDom' + i] = true;
 			
 			$scope.showEchartsId = i;
-			
-			minMaxArr[$scope.showEchartsId] = new Object()
-
 		}
+		
+		$scope.repeatInput = new Array()
+	
+		$scope.showBox = function(boxName, i) {
+			$scope[boxName] = true;
+			$scope.modelConfig = {
+				theme: 'default',
+				event: [],
+				dataLoaded: true
+			}
+		    
+		    $scope.repeatInput = new Array()
+		    
+		    
+		    var newTempObj = new Object();
+		    for(var k in $scope.echItemes[i].option) {
+		    	newTempObj[k] = $scope.echItemes[i].option[k];
+		    }
+		    
+		    var dataLen = newTempObj.series.length;
+		    
+		    for (var j = 0; j < dataLen; j++) {
+		    	$scope.repeatInput.push({
+		    		startInp : 300,
+		    		endInp : 0
+		    	})
+		    }
+		    	    
+		    if ($scope.modelOption && $scope.modelOption.visualMap) {
+
+		    	$scope.repeatInput.forEach(function(val, index) {
+		    		val.startInp = $scope.modelOption.visualMap[index].range[1];
+		    		val.endInp = $scope.modelOption.visualMap[index].range[0];
+		    	})
+		    	
+		    	return
+		    }
+		    
+		    newTempObj.visualMap = new Array();
+		    
+		    for (var j = 0; j < dataLen; j++) {
+
+		    	
+		    	newTempObj.series[j].markLine = {
+		    		data : [{yAxis: 300}]
+		    	}
+		    	
+		    	var max = newTempObj.yAxis[j] ? newTempObj.yAxis[j].max : newTempObj.yAxis[0].max
+		    	var min = newTempObj.yAxis[j] ? newTempObj.yAxis[j].min : newTempObj.yAxis[0].min
+		    	
+		    	console.log(max, min, newTempObj, 'newTempObj')
+		    	
+		    	newTempObj.visualMap.push({
+		    		seriesIndex: j,
+		    		show: false,
+		    		max: max,
+			    	min: min,
+			    	left: 10,
+			    	top: 150 * j + 10,
+			    	range: [0, 300],
+			    	calculable: true,
+			    	realtime: true,
+			    	hoverLink: true,
+			    	outOfRange: {
+			    		symbol: 'diamond',
+			    		symbolSize: '30'
+			    	}
+		    	})
+		    }
+		   			
+			$scope.modelOption = newTempObj
+		}
+		
+		$scope.chanMakeLine = function(name, val, i) {
+			if (name == 'start') {
+//				$scope.modelOption.serise[i].markLine.data[0].yAxis = val;
+
+				$scope.modelOption.visualMap[i].range[1] = val;
+				
+				if (!$scope.modelOption.series[i].markLine) {
+					$scope.modelOption.series[i].markLine = {data: new Array()};
+				}
+
+				$scope.modelOption.series[i].markLine.data[0] = {yAxis: val};
+				
+				console.log($scope.modelOption, '$scope.modelOption')
+			}else if (name == 'end') {				
+//				$scope.modelOption.serise[i].markLine.data[1].yAxis = val;
+				$scope.modelOption.visualMap[i].range[0] = val;
+				
+				if (!$scope.modelOption.series[i].markLine) {
+					$scope.modelOption.series[i].markLine = {data: new Array()}
+				}
+				
+				$scope.modelOption.series[i].markLine.data[1] = {yAxis: val};				
+			}
+		}
+		
+		$scope.hideBox = function(boxName) {
+			$scope[boxName] = false;
+			
+			console.log($scope.modelOption, 'hide')
+			
+		}
+		
 	}])
  

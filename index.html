@@ -73,7 +73,7 @@
         }
         
         [ng-drag] {
-        	z-index: 1000000;
+        	/*z-index: 1000000;*/
         }
            
         .mainHeader>div>div {
@@ -147,6 +147,51 @@
 		.mainHeader>div>div.makeLineInp button {
 			width: 43px;
 		}
+		
+		.box {
+			position: fixed;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			background-color: #fff;
+			
+		}
+		
+		.box  ng-echarts{
+			display: inline-block;
+			width: 600px;
+			height: 600px;
+		}
+		
+		.box > .boxClose {
+			position: absolute;
+			top: 30px;
+			right: 30px;
+			cursor: pointer;
+		}
+		.box .boxHeader {
+			height: 20%;
+			width: 100%;
+			background-color: orange;
+			display: flex;
+			justify-content: space-around;
+			align-items: center;
+			
+			overflow: auto;
+		}
+		
+		.box .boxHeader > div {
+			flex: 1;
+			text-align: center;
+		}
+		
+		.box .boxMain {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			height: 80%;
+		}
     </style>
 </head>
 <body ng-app='myApp' ng-controller="myApp.controller" ng-init='showEchartsId = 0'>
@@ -163,8 +208,7 @@
             		<div ng-drop='true' ng-drop-success='hasDropY($data)'></div>
             		<div class='makeLineInp'>
             			<div>
-            				<label for="staInp">预测值:&nbsp;</label><input ng-change='chanMakeLine("start", startInp)' ng-model='startInp' id='staInp' type="text" /><br />
-            				<label for="endInp">实际值:&nbsp;</label><input ng-change='chanMakeLine("end", endInp)' ng-model='endInp' id='endInp' type="text" />
+            	
             			</div>
 						<div>
 							<button ng-click='getLineData()'>提交</button>
@@ -178,12 +222,26 @@
             </div>
             <div class='echarts'>
             	<!--<div ng-click='echartsClick(echIndex, echItem)' echarts='{{"option" + echIndex}}' ng-repeat='(echIndex, echItem) in echItemes'></div>-->
-            	<ng-echarts ng-click='echartsClick(echIndex, echItem)' ec-config='echItem.config' ec-option='echItem.option' ng-repeat='(echIndex, echItem) in echItemes'></ng-echarts>
+            	<ng-echarts ng-dblclick='showBox("fullPage", echIndex)' ng-click='echartsClick(echIndex, echItem)' ec-config='echItem.config' ec-option='echItem.option' ng-repeat='(echIndex, echItem) in echItemes'></ng-echarts>
             	<!--<ng-echarts ng-show='echItem.echToggle' ng-click='echartsClick(echIndex, echItem)' ec-config='echItem.config' ec-option='echItem.option' ng-repeat='(echIndex, echItem) in echItemes1'></ng-echarts>-->
             	<div ng-drop='true' ng-drop-success='addEcharts($data)'></div>
             </div>
 
         </div>
     </div>
+
+	<div ng-show='fullPage' class='box'>
+		<div ng-click='hideBox("fullPage")' class='boxClose'><img src="./img/close.png" alt="" /></div>
+		<div class='boxHeader'>
+			<div ng-repeat='(index, item) in repeatInput'>
+				<label for="staInp">最大值:&nbsp;</label><input ng-change='chanMakeLine("start", item.startInp, index)' ng-model='item.startInp' id='staInp' type="text" /><br />
+				<label for="endInp">最小值:&nbsp;</label><input ng-change='chanMakeLine("end", item.endInp, index)' ng-model='item.endInp' id='endInp' type="text" />
+			</div>
+		</div>
+		<div class='boxMain'>
+			<ng-echarts ec-config='modelConfig' ec-option='modelOption'></ng-echarts>		
+		</div>
+
+	</div>
 </body>
 </html>

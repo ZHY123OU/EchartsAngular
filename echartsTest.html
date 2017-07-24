@@ -100,7 +100,7 @@
 </html>
 <script>
 	angular.module('myApp', ['ngDraggable', 'ngEcharts'])
-	.controller('myApp.ctrl', ['$scope', function($scope) {
+	.controller('myApp.ctrl', ['$scope', '$interval', '$timeout', function($scope, $interval, $timeout) {
 		$scope.option = {
 			tooltip : {
 	            trigger: 'axis',
@@ -169,7 +169,23 @@
 	        ],
 	        color : ['orange', 'red', 'yellow', 'green', 'skyblue']
 		};
-
+		
+		function fun2() {
+			console.log('im timer2!!!!')
+		}
+		
+		var timer2 = $timeout
+		
+		var timer = $interval(function() {
+			timer2(fun2)
+		}, 100, 1)
+		
+		timer.then(function(data) {
+			console.log(data, 'success')
+		}).then(function(data) {
+			console.log(data, 'err')
+		})
+		
 		function onClick(params) {
 			console.log(params)
 		}
